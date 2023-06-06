@@ -11,8 +11,7 @@ export default function DashboardLayout({
   const { user } = useAuth()
 
   useEffect(() => {
-    if (user == null) redirect('/')
+    if (user) redirect('/admin')
   }, [user])
-
   return <main>{children}</main>
 }
