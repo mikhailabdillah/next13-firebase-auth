@@ -1,0 +1,11 @@
+.formControl {
+  @apply w-full mb-4 block;
+
+  & input {
+    @apply w-full border-2 border-gray-100 rounded-md py-3 px-4;
+  }
+
+  & label {
+    @apply text-sm font-medium;
+  }
+}
