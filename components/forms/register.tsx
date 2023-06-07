@@ -3,51 +3,52 @@
 import { Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import FormControl from '../ui/form-control'
-import signIn from '@/services/auth/signin'
+import signUp from '@/services/auth/signup'
 import Button from '../ui/button'
 import Alert from '../ui/alert'
-import { useState } from 'react'
 import { Spinner } from '../icons'
+import { useState } from 'react'
 
-const LoginForm = () => {
+const RegisterForm = () => {
   const initialValues = {
-    username: '',
+    email: '',
     password: '',
+    repassword: '',
   }
-
   const [error, setError] = useState(false)
 
   return (
     <div className="pt-8">
       {error && (
-        <Alert variant="danger">
+        <Alert variant="warning">
           <div className="text-lg font-bold block mb-2">Failed!</div>
-          <div>
-            The email and password you entered did not match our records.
-          </div>
+          <div>Something went wrong please try again.</div>
         </Alert>
       )}
       <Formik
         initialValues={initialValues}
         validationSchema={Yup.object({
-          username: Yup.string()
+          email: Yup.string()
             .email('Please enter valid email address')
             .required('This field is required'),
-          password: Yup.string().required('This field is required'),
+          password: Yup.string()
+            .min(8, 'Your password is too short.')
+            .required('This field is required'),
+          repassword: Yup.string()
+            .oneOf([Yup.ref('password')], 'Passwords must match')
+            .required('Please retype your password.'),
         })}
         onSubmit={async (values, { resetForm, setSubmitting }) => {
-          await signIn(values.username, values.password)
+          await signUp(values.email, values.password)
             .then((userCredential) => {
-              // localStorage.setItem("next:user", JSON.stringify({
-              //   token: userCredential.
-              // }))
               resetForm()
             })
             .catch((error) => {
+              // Error state
               setError(true)
             })
             .finally(() => {
-              setTimeout(() => setError(false), 9000)
+              setError(false)
               setSubmitting(false)
             })
         }}
@@ -63,19 +64,17 @@ const LoginForm = () => {
           <Form>
             <div className="flex flex-wrap w-full">
               <FormControl>
-                <label htmlFor="username">Email or Username</label>
+                <label htmlFor="email">Email</label>
                 <input
-                  id="username"
+                  id="email"
                   type="text"
-                  value={values.username}
-                  onChange={handleChange('username')}
-                  onBlur={handleBlur('username')}
-                  placeholder="name@mail.com"
+                  value={values.email}
+                  onChange={handleChange('email')}
+                  onBlur={handleBlur('email')}
+                  placeholder="Enter email address"
                 />
-                {Boolean(errors.username) && touched.username && (
-                  <span className="text-xs text-red-600">
-                    {errors.username}
-                  </span>
+                {Boolean(errors.email) && touched.email && (
+                  <span className="text-xs text-red-600">{errors.email}</span>
                 )}
               </FormControl>
               <FormControl>
@@ -94,8 +93,24 @@ const LoginForm = () => {
                   </span>
                 )}
               </FormControl>
+              <FormControl>
+                <label htmlFor="repassword">Retype Password</label>
+                <input
+                  id="repassword"
+                  type="password"
+                  value={values.repassword}
+                  onChange={handleChange('repassword')}
+                  onBlur={handleBlur('repassword')}
+                  placeholder="Retype your Password"
+                />
+                {Boolean(errors.repassword) && touched.repassword && (
+                  <span className="text-xs text-red-600">
+                    {errors.repassword}
+                  </span>
+                )}
+              </FormControl>
               <Button type="submit" className="w-full mt-4">
-                {!isSubmitting ? 'Sign In' : <Spinner />}
+                {!isSubmitting ? 'Create an Account' : <Spinner />}
               </Button>
             </div>
           </Form>
@@ -105,4 +120,4 @@ const LoginForm = () => {
   )
 }
 
-export default LoginForm
+export default RegisterForm

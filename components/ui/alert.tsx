@@ -29,7 +29,11 @@ const Alert = ({
   }
 
   return (
-    <div className={cn(styles.default, variantClass, className)} {...rest}>
+    <div
+      role="alert"
+      className={cn(styles.default, variantClass, className)}
+      {...rest}
+    >
       {children}
       <button
         type="button"
